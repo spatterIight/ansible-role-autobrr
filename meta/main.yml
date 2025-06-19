@@ -2,7 +2,7 @@
 galaxy_info:
   author: spatterlight
   role_name: autobrr
-  description: An Ansible role for installing Autobrr, a bittorrent client programmed in C++ / Qt that uses libtorrent
+  description: An Ansible role for installing Autobrr, a easy to use download automater for torrents and usenet
   platforms:
     - name: Debian
       versions:
