@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 spatterlight
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+
+- name: Perform Autobrr installation tasks
+  tags:
+    - setup-all
+    - setup-autobrr
+    - install-all
+    - install-autobrr
+  block:
+    - name: Validate Autobrr configuration
+      when: autobrr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+
+    - name: Install Autobrr
+      when: autobrr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+
+- name: Perform Autobrr uninstallation tasks
+  tags:
+    - setup-all
+    - setup-autobrr
+  block:
+    - name: Uninstall Autobrr
+      when: not autobrr_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"

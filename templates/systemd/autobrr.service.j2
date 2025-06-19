@@ -1,0 +1,60 @@
+{#
+SPDX-FileCopyrightText: 2025 Slavi Pantaleev
+SPDX-FileCopyrightText: 2025 spatterlight
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
+[Unit]
+Description=Autobrr ({{ autobrr_identifier }})
+{% for service in autobrr_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+{% for service in autobrr_systemd_wanted_services_list %}
+Wants={{ service }}
+{% endfor %}
+
+[Service]
+Type=simple
+Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ autobrr_container_stop_grace_time_seconds }} {{ autobrr_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ autobrr_identifier }} 2>/dev/null || true'
+
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
+			--rm \
+			--name={{ autobrr_identifier }} \
+			--log-driver=none \
+			--user={{ autobrr_uid }}:{{ autobrr_gid }} \
+			--cap-drop=ALL \
+			--read-only \
+			--network={{ autobrr_container_network }} \
+			{% if autobrr_container_http_bind_port %}
+			-p {{ autobrr_container_http_bind_port }}:{{ autobrr_container_http_port }} \
+			{% endif %}
+			--env-file={{ autobrr_base_path }}/env \
+			--label-file={{ autobrr_base_path }}/labels \
+			--mount type=bind,src={{ autobrr_data_path }},dst=/config \
+			{% for volume in autobrr_container_additional_volumes %}
+			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+			{% endfor %}
+			{% for arg in autobrr_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ autobrr_container_image }}
+
+{% for network in autobrr_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ autobrr_identifier }}
+{% endfor %}
+
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ autobrr_identifier }}
+
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ autobrr_container_stop_grace_time_seconds }} {{ autobrr_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ autobrr_identifier }} 2>/dev/null || true'
+
+Restart=always
+RestartSec=30
+SyslogIdentifier={{ autobrr_identifier }}
+
+[Install]
+WantedBy=multi-user.target

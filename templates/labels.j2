@@ -1,0 +1,44 @@
+{#
+SPDX-FileCopyrightText: 2025 spatterlight
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
+{% if autobrr_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if autobrr_container_labels_traefik_docker_network %}
+traefik.docker.network={{ autobrr_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if autobrr_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ autobrr_identifier }}-slashless-redirect.redirectregex.regex=^({{ autobrr_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ autobrr_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [autobrr_identifier + '-slashless-redirect'] %}
+{% endif %}
+
+{% if autobrr_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ autobrr_identifier }}-strip-prefix.stripprefix.prefixes={{ autobrr_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [autobrr_identifier + '-strip-prefix'] %}
+{% endif %}
+
+traefik.http.routers.{{ autobrr_identifier }}.rule={{ autobrr_container_labels_traefik_rule }}
+{% if autobrr_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ autobrr_identifier }}.priority={{ autobrr_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ autobrr_identifier }}.service={{ autobrr_identifier }}
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ autobrr_identifier }}.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ autobrr_identifier }}.entrypoints={{ autobrr_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ autobrr_identifier }}.tls={{ autobrr_container_labels_traefik_tls | to_json }}
+{% if autobrr_container_labels_traefik_tls %}
+traefik.http.routers.{{ autobrr_identifier }}.tls.certResolver={{ autobrr_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ autobrr_identifier }}.loadbalancer.server.port={{ autobrr_container_http_port }}
+{% endif %}
+
+{{ autobrr_container_labels_additional_labels }}
