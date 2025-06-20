@@ -15,7 +15,6 @@
   with_items:
     - "{{ autobrr_base_path }}"
     - "{{ autobrr_data_path }}"
-    - "{{ autobrr_download_path }}"
 
 - name: Ensure Autobrr support files installed
   ansible.builtin.template:
