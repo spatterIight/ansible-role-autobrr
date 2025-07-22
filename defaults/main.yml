@@ -15,7 +15,7 @@ autobrr_gid: ''
 autobrr_timezone: 'Etc/UTC'
 
 # renovate: datasource=docker depName=ghcr.io/autobrr/autobrr versioning=semver
-autobrr_version: v1.63.1
+autobrr_version: v1.64.0
 autobrr_arch: amd64
 
 # The hostname at which autobrr is served.
