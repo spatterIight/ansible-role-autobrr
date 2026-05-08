@@ -31,7 +31,6 @@ autobrr_data_path: "{{ autobrr_base_path }}/data"
 autobrr_container_image: "{{ autobrr_container_image_registry_prefix }}autobrr/autobrr:{{ autobrr_container_image_tag }}"
 autobrr_container_image_tag: "{{ autobrr_version }}"
 autobrr_container_image_registry_prefix: ghcr.io/
-autobrr_container_image_force_pull: "{{ autobrr_container_image.endswith(':latest') }}"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 autobrr_container_network: "{{ autobrr_identifier }}"
