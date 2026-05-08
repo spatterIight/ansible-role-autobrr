@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2025 Slavi Pantaleev
 # SPDX-FileCopyrightText: 2025 spatterlight
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -26,34 +27,36 @@
   with_items:
     - env
     - labels
+  register: autobrr_support_files_result
 
 - name: Ensure Autobrr container image is pulled via community.docker.docker_image_pull
   when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
   community.docker.docker_image_pull:
     name: "{{ autobrr_container_image }}"
     pull: always
-  register: image_pull_result
+  register: autobrr_container_image_pull_result_ansible_module
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: image_pull_result is not failed
+  until: autobrr_container_image_pull_result_ansible_module is not failed
 
-- name: Ensure Autobrr container image is pulled via command
+- name: Ensure Autobrr container image is pulled via ansible.builtin.command
   when: devture_systemd_docker_base_container_image_pull_method == 'command'
   ansible.builtin.command:
     cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ autobrr_container_image }}"
-  register: image_pull_result
+  register: autobrr_container_image_pull_result_command
   retries: "{{ devture_playbook_help_container_retries_count }}"
   delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: image_pull_result is not failed
-  changed_when: "'Downloaded newer image' in image_pull_result.stdout"
+  until: autobrr_container_image_pull_result_command is not failed
+  changed_when: "'Downloaded newer image' in autobrr_container_image_pull_result_command.stdout"
 
 - name: Ensure Autobrr container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
-  community.general.docker_network:
+  community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
     name: "{{ autobrr_container_network }}"
     driver: bridge
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
+  register: autobrr_network_creation_result
 
 - name: Ensure Autobrr container network is created via ansible.builtin.command
   when: devture_systemd_docker_base_container_network_creation_method == 'command'
@@ -63,9 +66,9 @@
       {% if devture_systemd_docker_base_ipv6_enabled %}--ipv6{% endif %}
       {{ devture_systemd_docker_base_container_networks_driver_options_string }}
       {{ autobrr_container_network }}
-  register: network_creation_result
-  changed_when: network_creation_result.rc == 0
-  failed_when: network_creation_result.rc != 0 and 'already exists' not in network_creation_result.stderr
+  register: autobrr_network_creation_result
+  changed_when: autobrr_network_creation_result.rc == 0
+  failed_when: autobrr_network_creation_result.rc != 0 and 'already exists' not in autobrr_network_creation_result.stderr
 
 - name: Ensure Autobrr systemd service is present
   ansible.builtin.template:
@@ -73,3 +76,14 @@
     dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ autobrr_identifier }}.service"
     mode: "0644"
     lstrip_blocks: true
+  register: autobrr_systemd_service_result
+
+- name: Determine whether Autobrr needs a restart
+  ansible.builtin.set_fact:
+    autobrr_restart_necessary: >-
+      {{
+        autobrr_support_files_result.changed | default(false)
+        or autobrr_systemd_service_result.changed | default(false)
+        or autobrr_container_image_pull_result_ansible_module.changed | default(false)
+        or autobrr_container_image_pull_result_command.changed | default(false)
+      }}

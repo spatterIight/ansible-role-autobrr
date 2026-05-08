@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2025 spatterlight
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -112,3 +113,13 @@ autobrr_container_additional_volumes: []
 
 # A list of extra arguments to pass to the container
 autobrr_container_extra_arguments: []
+
+# autobrr_restart_necessary controls whether the Autobrr systemd
+# service will be restarted (when true) or merely started (when false) by the
+# systemd service manager role (when conditional restart is enabled).
+#
+# This value is automatically computed during installation based on whether
+# any configuration files, the systemd service file, or the container image changed.
+# The default of `false` means "no restart needed" — appropriate when the role's
+# installation tasks haven't run (e.g., due to --tags skipping them).
+autobrr_restart_necessary: false
