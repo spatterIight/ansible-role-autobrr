@@ -1,5 +1,9 @@
+# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
+# SPDX-FileCopyrightText: 2025 MASH project contributors
 # SPDX-FileCopyrightText: 2025 spatterlight
-# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -30,7 +34,9 @@ autobrr_path_prefix: /
 
 autobrr_container_image: "{{ autobrr_container_image_registry_prefix }}autobrr/autobrr:{{ autobrr_container_image_tag }}"
 autobrr_container_image_tag: "{{ autobrr_version }}"
-autobrr_container_image_registry_prefix: ghcr.io/
+autobrr_container_image_registry_prefix: "{{ autobrr_container_image_registry_prefix_upstream }}"
+autobrr_container_image_registry_prefix_upstream: "{{ autobrr_container_image_registry_prefix_upstream_default }}"
+autobrr_container_image_registry_prefix_upstream_default: ghcr.io/
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 autobrr_container_network: "{{ autobrr_identifier }}"
