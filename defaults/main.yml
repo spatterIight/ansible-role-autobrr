@@ -43,11 +43,6 @@ autobrr_container_additional_networks_default: []
 autobrr_container_additional_networks_auto: []
 autobrr_container_additional_networks_custom: []
 
-# Controls how long to wait for the container to stop gracefully before killing it.
-# Because `devture_systemd_docker_base_container_stop_grace_time_seconds` may be quite short and databases are more important to stop gracefully,
-# we default to at least 30 seconds.
-autobrr_container_stop_grace_time_seconds: "{{ [devture_systemd_docker_base_container_stop_grace_time_seconds, 30] | max }}"
-
 # List of systemd services that the Autobrr systemd service depends on
 autobrr_systemd_required_services_list: "{{ (autobrr_systemd_required_services_list_default + autobrr_systemd_required_services_list_auto + autobrr_systemd_required_services_list_custom) | unique }}"
 autobrr_systemd_required_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
