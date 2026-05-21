@@ -26,7 +26,7 @@ autobrr_hostname: ''
 # This value must either be `/` or not end with a slash (e.g. `/autobrr`).
 autobrr_path_prefix: /
 
-autobrr_base_path: "{{ autobrr_identifier }}"
+autobrr_base_path: "/{{ autobrr_identifier }}"
 autobrr_data_path: "{{ autobrr_base_path }}/data"
 
 autobrr_container_image: "{{ autobrr_container_image_registry_prefix }}autobrr/autobrr:{{ autobrr_container_image_tag }}"
