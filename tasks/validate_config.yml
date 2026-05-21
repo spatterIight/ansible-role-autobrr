@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: (Deprecation) Catch and report renamed settings
   ansible.builtin.fail:
     msg: >-
@@ -12,12 +11,12 @@
       Please change your configuration to rename the variable (`{{ item.old }}` -> `{{ item.new }}`).
   when: "lookup('ansible.builtin.varnames', ('^' + item.old + '$'), wantlist=True) | length > 0"
   with_items:
-    - {'old': 'autobrr_container_additional_environment_variables', 'new': 'autobrr_environment_variables_additional_variables'}
+    - { "old": "autobrr_container_additional_environment_variables", "new": "autobrr_environment_variables_additional_variables" }
     - { "old": "autobrr_container_image_force_pull", "new": "<removed> (the new community.docker.docker_image_pull module handles this natively)" }
 
 - name: Fail if required Autobrr settings not defined
   ansible.builtin.fail:
-    msg: >
+    msg: >-
       You need to define a required configuration setting (`{{ item }}`).
   when: "lookup('vars', item, default='') | string | length == 0"
   with_items:
@@ -27,7 +26,7 @@
 
 - name: Fail if Autobrr architecture is not supported
   ansible.builtin.fail:
-    msg: >
+    msg: >-
       Your configuration specifies a CPU architecture (`{{ autobrr_arch }}`) which is not currently supported.
       This Autobrr role also does not support self-building yet, so it's not possible to make use of it.
   when: "autobrr_arch not in ['amd64', 'arm64']"
