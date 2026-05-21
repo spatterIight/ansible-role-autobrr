@@ -1,5 +1,9 @@
+# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
+# SPDX-FileCopyrightText: 2025 MASH project contributors
 # SPDX-FileCopyrightText: 2025 spatterlight
-# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -10,31 +14,35 @@
 autobrr_enabled: true
 
 autobrr_identifier: autobrr
+autobrr_base_path: "/{{ autobrr_identifier }}"
+autobrr_data_path: "{{ autobrr_base_path }}/data"
 
-autobrr_uid: ''
-autobrr_gid: ''
-autobrr_timezone: 'Etc/UTC'
+autobrr_uid: ""
+autobrr_gid: ""
+autobrr_timezone: "Etc/UTC"
 
 # renovate: datasource=docker depName=ghcr.io/autobrr/autobrr versioning=semver
 autobrr_version: v1.77.1
 autobrr_arch: amd64
 
 # The hostname at which autobrr is served.
-autobrr_hostname: ''
+autobrr_hostname: ""
 
 # The path at which autobrr is served.
 # This value must either be `/` or not end with a slash (e.g. `/autobrr`).
 autobrr_path_prefix: /
 
-autobrr_base_path: "{{ autobrr_identifier }}"
-autobrr_data_path: "{{ autobrr_base_path }}/data"
-
 autobrr_container_image: "{{ autobrr_container_image_registry_prefix }}autobrr/autobrr:{{ autobrr_container_image_tag }}"
 autobrr_container_image_tag: "{{ autobrr_version }}"
-autobrr_container_image_registry_prefix: ghcr.io/
+autobrr_container_image_registry_prefix: "{{ autobrr_container_image_registry_prefix_upstream }}"
+autobrr_container_image_registry_prefix_upstream: "{{ autobrr_container_image_registry_prefix_upstream_default }}"
+autobrr_container_image_registry_prefix_upstream_default: ghcr.io/
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 autobrr_container_network: "{{ autobrr_identifier }}"
+
+# Control if the container network is deleted on uninstalling.
+autobrr_container_network_deletion_enabled: true
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -42,11 +50,6 @@ autobrr_container_additional_networks: "{{ (autobrr_container_additional_network
 autobrr_container_additional_networks_default: []
 autobrr_container_additional_networks_auto: []
 autobrr_container_additional_networks_custom: []
-
-# Controls how long to wait for the container to stop gracefully before killing it.
-# Because `devture_systemd_docker_base_container_stop_grace_time_seconds` may be quite short and databases are more important to stop gracefully,
-# we default to at least 30 seconds.
-autobrr_container_stop_grace_time_seconds: "{{ [devture_systemd_docker_base_container_stop_grace_time_seconds, 30] | max }}"
 
 # List of systemd services that the Autobrr systemd service depends on
 autobrr_systemd_required_services_list: "{{ (autobrr_systemd_required_services_list_default + autobrr_systemd_required_services_list_auto + autobrr_systemd_required_services_list_custom) | unique }}"
@@ -86,7 +89,7 @@ autobrr_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 # autobrr_container_labels_additional_labels: |
 #   my.label=1
 #   another.label="here"
-autobrr_container_labels_additional_labels: ''
+autobrr_container_labels_additional_labels: ""
 
 # autobrr_environment_variables_additional_variables contains a multiline string with additional environment variables to pass to the container.
 #
@@ -94,7 +97,7 @@ autobrr_container_labels_additional_labels: ''
 # autobrr_environment_variables_additional_variables: |
 #   VAR=1
 #   ANOTHER=value
-autobrr_environment_variables_additional_variables: ''
+autobrr_environment_variables_additional_variables: ""
 
 # A list of additional "volumes" to mount in the container.
 #
