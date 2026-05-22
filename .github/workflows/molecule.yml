@@ -57,6 +57,6 @@ jobs:
         working-directory: autobrr
         run: ansible-galaxy collection install -r molecule/default/requirements.yml
 
-      - name: Run molecule
+      - name: Run Molecule
         working-directory: autobrr
         run: molecule test --scenario-name ${{ matrix.scenario }}
