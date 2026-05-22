@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Verify
+- name: Verify Autobrr systemd service
   hosts: all
   become: true
   gather_facts: false
@@ -39,7 +39,7 @@
         fail_msg: "Autobrr did not respond as expected ({{ ep.status | default('no response') }})"
         success_msg: "Autobrr responded with {{ ep.status }}"
 
-    - name: Show service status summary
+    - name: Show Autobrr systemd service status summary
       ansible.builtin.debug:
         msg:
           - "Autobrr systemd: {{ svc.status.ActiveState }}"
