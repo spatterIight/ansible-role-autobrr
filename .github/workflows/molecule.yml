@@ -5,7 +5,7 @@ on: [push, pull_request]  # yamllint disable-line rule:truthy
 
 jobs:
   molecule:
-    name: molecule [${{ matrix.distro }}] [${{ matrix.scenario }}]
+    name: Molecule [${{ matrix.distro }}] [${{ matrix.scenario }}]
     runs-on: ubuntu-latest
 
     strategy:

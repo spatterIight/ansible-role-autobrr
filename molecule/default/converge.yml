@@ -19,7 +19,7 @@
       loop_control:
         loop_var: role_name
 
-- name: Ensure autobrr service is started
+- name: Ensure Autobrr service is started
   hosts: all
   become: true
   gather_facts: false
